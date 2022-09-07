@@ -1,20 +1,21 @@
 #include <cstdio>
 #include <cassert>
-#include <map>
+#include <list>
+#include <vector>
 #include "hexdump.hh"
 
 int main() {
-    std::map<int, bool> ls;
+    std::vector<int> ls;
 
     // read integers from stdin, storing them in sorted order
     int val;
     while (fscanf(stdin, "%d", &val) == 1) {
-        ls.insert({val, true});
+        auto it = std::lower_bound(ls.begin(), ls.end(), val);
+        ls.insert(it, val);
     }
 
     // print integers in sorted order
-    for (auto kv : ls) {
-        // NB Elements of `std::map` are key-value pairs. We want the key.
-        fprintf(stdout, "%d\n", kv.first);
+    for (auto v : ls) {
+        fprintf(stdout, "%d\n", v);
     }
 }
