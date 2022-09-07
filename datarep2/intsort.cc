@@ -5,7 +5,7 @@
 #include "hexdump.hh"
 
 int main() {
-    std::vector<int> ls;
+    std::list<int> ls;
 
     // read integers from stdin, storing them in sorted order
     int val;
