@@ -1,4 +1,4 @@
-PROGRAMS = sizes sizes2 sizeof compounds intgen intsort intsort2 intsort3
+PROGRAMS = sizes sizeof compounds intgen intsort intsort2 intsort3
 all: $(PROGRAMS)
 
 ALLPROGRAMS = $(PROGRAMS)
