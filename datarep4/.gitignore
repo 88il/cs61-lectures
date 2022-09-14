@@ -1,6 +1,9 @@
 ptrarith
 segments
 stack
+stackmulti
+stackrecurse
+stacklayout
 ubsignedinc
 union
 unsignedoverflow

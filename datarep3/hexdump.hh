@@ -42,6 +42,6 @@ void fhexdump(FILE* f, const void* ptr, size_t size, const char* objname = nullp
 //    Like fhexdump, but start with offset `first_offset` instead of the
 //    address of `ptr`.
 void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size,
-				 const char* objname = nullptr);
+                 const char* objname = nullptr);
 
 #endif

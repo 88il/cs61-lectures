@@ -1,5 +1,5 @@
 def f(arg):
-	arg[0] = -1
+    arg[0] = -1
 
 l = [2]
 f(l)

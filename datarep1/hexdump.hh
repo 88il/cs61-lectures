@@ -12,7 +12,7 @@
 //    the BBs are hexadecimal values of those bytes, and the Cs show
 //    the printable ASCII characters corresponding to those bytes
 //    (`.` is displayed for non-printable characters).
-void hexdump(const void* ptr, size_t size, const char* decoration = nullptr);
+void hexdump(const void* ptr, size_t size, const char* objname = nullptr);
 
 // hexdump_object(object)
 //    Like hexdump(&object, sizeof(object)).
@@ -27,7 +27,7 @@ void hexdump(const void* ptr, size_t size, const char* decoration = nullptr);
 // fhexdump(f, ptr, size)
 //    Like `hexdump(ptr, size)`, but print to file `f` rather than standard
 //    output.
-void fhexdump(FILE* f, const void* ptr, size_t size, const char* decoration = nullptr);
+void fhexdump(FILE* f, const void* ptr, size_t size, const char* objname = nullptr);
 
 // fhexdump_object(f, object)
 //    Like `fhexdump(f, &object, sizeof(object))`.
@@ -41,6 +41,7 @@ void fhexdump(FILE* f, const void* ptr, size_t size, const char* decoration = nu
 // fhexdump_at(f, first_offset, ptr, size)
 //    Like fhexdump, but start with offset `first_offset` instead of the
 //    address of `ptr`.
-void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size);
+void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size,
+                 const char* objname = nullptr);
 
 #endif
