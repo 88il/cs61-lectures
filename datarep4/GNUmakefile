@@ -1,7 +1,11 @@
-PROGRAMS = ptrarith union segments stack
+PROGRAMS = $(patsubst %.cc,%,$(wildcard passing[0-9].cc)) \
+	vector union ptrarith segments unsignedoverflow ubsignedinc
 all: $(PROGRAMS)
 
 ALLPROGRAMS = $(PROGRAMS)
+
+# Default to no optimization
+O ?= 0
 
 include ../common/rules.mk
 
