@@ -2,10 +2,10 @@
 // Compile me with different compilers and optimization levels!
 
 int main() {
-    char c1;
-    int i1;
-    char c2;
-    short s1;
+    char c1 = 61;
+    int i1 = 62;
+    char c2 = 63;
+    short s1 = 64;
 
     hexdump_named_object(c1);
     hexdump_named_object(c2);
