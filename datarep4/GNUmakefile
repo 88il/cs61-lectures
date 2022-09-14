@@ -1,5 +1,5 @@
 PROGRAMS = $(patsubst %.cc,%,$(wildcard passing[0-9].cc)) \
-	vector union ptrarith segments unsignedoverflow ubsignedinc
+	vector union segments unsignedoverflow ubsignedinc stack stackrecurse
 all: $(PROGRAMS)
 
 ALLPROGRAMS = $(PROGRAMS)
