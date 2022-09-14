@@ -11,18 +11,11 @@ int main() {
     int* p1 = &i1;
     char c4 = 61;
 
-    printf("c1:\n");
-    hexdump_object(c1);
-    printf("c2:\n");
-    hexdump_object(c2);
-    printf("c3:\n");
-    hexdump_object(c3);
-    printf("c4:\n");
-    hexdump_object(c4);
-    printf("i1:\n");
-    hexdump_object(i1);
-    printf("f1:\n");
-    hexdump_object(f1);
-    printf("p1:\n");
-    hexdump_object(p1);
+    hexdump_named_object(c1);
+    hexdump_named_object(c2);
+    hexdump_named_object(c3);
+    hexdump_named_object(c4);
+    hexdump_named_object(i1);
+    hexdump_named_object(f1);
+    hexdump_named_object(p1);
 }
