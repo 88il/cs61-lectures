@@ -1,5 +1,7 @@
 #include <cstdio>
 
+// testing github fork
+
 void f(int arg) {
     arg = -1;
     (void) arg; // quiet warning
