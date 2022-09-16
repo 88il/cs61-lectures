@@ -15,5 +15,5 @@ int main(int argc, char** argv) {
 
     int x_incr = x + 1;
     assert(x_incr > x);
-    printf("%d > %d - assertion passed\n", x_incr, x);
+    printf("assertion passed, so %d > %d\n", x_incr, x);
 }
