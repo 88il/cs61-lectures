@@ -1,11 +1,11 @@
 PROGRAMS = signedoverflow signedoverflow-clang-noopt \
-	mb0 mb1 mb2 mb3 mb4 \
+	mb0 mb1 mb2 mb2s mb3 mb4 \
 	wtf
 all: $(PROGRAMS)
 
 BASEPROGRAMS = opt1 opt2 unsignedoverflow signedoverflow \
 	signedloop unsignedloop safesignedloop tablelookup wtf
-ALLPROGRAMS = $(PROGRAMS) accessor mb3 mb4
+ALLPROGRAMS = $(PROGRAMS) accessor
 
 variants = $(1) $(addsuffix -noopt,$(1)) \
 	$(addsuffix -clang,$(1)) $(addsuffix -clang-noopt,$(1)) \
@@ -64,7 +64,7 @@ $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
 
-mb0 mb1 mb2 mb3 mb4: \
+mb0 mb1 mb2 mb2s mb3 mb4: \
 %: %.o mbdriver.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
