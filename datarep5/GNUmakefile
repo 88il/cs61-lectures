@@ -4,13 +4,12 @@ PROGRAMS = opt1 opt1-noopt opt2 opt2-noopt \
 	signedloop signedloop-noopt \
 	unsignedloop unsignedloop-noopt \
 	safesignedloop safesignedloop-noopt \
-	tablelookup-gcc tablelookup-gcc-noopt \
-	wtf
+	tablelookup-gcc tablelookup-gcc-noopt
 all: $(PROGRAMS)
 
 BASEPROGRAMS = opt1 opt2 unsignedoverflow signedoverflow \
 	signedloop unsignedloop safesignedloop tablelookup wtf
-ALLPROGRAMS = $(PROGRAMS) accessor mb3 mb4
+ALLPROGRAMS = $(PROGRAMS)
 
 variants = $(1) $(addsuffix -noopt,$(1)) \
 	$(addsuffix -clang,$(1)) $(addsuffix -clang-noopt,$(1)) \
@@ -49,27 +48,24 @@ $(BASEPROGRAMS): \
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 $(addsuffix -clang,$(BASEPROGRAMS)): \
-%: %.o hexdump.o
+%: %.o hexdump-clang.o
 	clang++ $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 $(addsuffix -gcc,$(BASEPROGRAMS)): \
-%: %.o hexdump.o
+%: %.o hexdump-gcc.o
 	$(CXX_GCC) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 $(addsuffix -noopt,$(BASEPROGRAMS)): \
-%: %.o hexdump.o
+%: %.o hexdump-noopt.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
 $(addsuffix -gcc-noopt,$(BASEPROGRAMS)): \
-%: %.o hexdump.o
+%: %.o hexdump-gcc-noopt.o
 	$(CXX_GCC) $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
 $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
-%: %.o hexdump.o
+%: %.o hexdump-clang-noopt.o
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
-
-mb%: mb%.o mb-driver.o hexdump.o
-	$(CXX) $(CXXFLAGS) -pthread $(LDFLAGS) $(O) -o $@ $^
 
 
 clean:
