@@ -63,9 +63,12 @@ unsigned long memnode_benchmark(unsigned noperations, int seed) {
 
     // compute a statistic from the remaining nodes and free them
     unsigned long result = 0;
-    for (node* n = list; n; n = n->next) {
+    node* n = list;
+    while (n) {
         result += n->value;
+        node* next = n->next;
         arena.deallocate(n);
+        n = next;
     }
     return result;
 }
