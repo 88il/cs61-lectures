@@ -2,7 +2,7 @@
 #include <random>
 
 struct node {
-    long contents;
+    long value;
 };
 
 
@@ -34,7 +34,7 @@ unsigned long memnode_benchmark(unsigned noperations, int seed) {
         int pos = random_node_index(randomness);
         if (n[pos] == nullptr) {
             n[pos] = arena.allocate();
-            n[pos]->contents = counter;
+            n[pos]->value = counter;
             ++counter;
         } else {
             arena.deallocate(n[pos]);
@@ -46,7 +46,7 @@ unsigned long memnode_benchmark(unsigned noperations, int seed) {
     unsigned long result = 0;
     for (int i = 0; i != nnodes; ++i) {
         if (n[i]) {
-            result += n[i]->contents;
+            result += n[i]->value;
             arena.deallocate(n[i]);
         }
     }

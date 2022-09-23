@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         }
         default:
             fprintf(stderr, "Usage: %s [-n NOPS] [-j NTHREADS] [-m MEMLIMIT]\n\
-  Default NOPS %u, NTHREADS 1, no MEMLIMIT", argv[0], noperations);
+  Default NOPS %u, NTHREADS 1, no MEMLIMIT\n", argv[0], noperations);
             exit(1);
         }
     }

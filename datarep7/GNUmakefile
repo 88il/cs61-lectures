@@ -92,7 +92,7 @@ $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
 
-mb0 mb1 mb2 mb2s mb3 mb4: \
+$(patsubst %.cc,%,$(wildcard mb[0-9].cc mb[0-9][0-9a-z].cc)): \
 %: %.o mbdriver.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
