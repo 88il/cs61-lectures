@@ -1,0 +1,7 @@
+*-clang
+*-clang-noopt
+*-gcc
+*-gcc-noopt
+*-noopt
+*-unsafe
+asmsrc.txt
