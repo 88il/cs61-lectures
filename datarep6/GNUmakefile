@@ -1,15 +1,9 @@
-PROGRAMS = opt1 opt1-noopt opt2 opt2-noopt \
-	unsignedoverflow \
-	signedoverflow signedoverflow-clang-noopt \
-	signedloop signedloop-noopt \
-	unsignedloop unsignedloop-noopt \
-	safesignedloop safesignedloop-noopt \
-	tablelookup-gcc tablelookup-gcc-noopt
+PROGRAMS = signedoverflow signedoverflow-clang-noopt wtf
 all: $(PROGRAMS)
 
 BASEPROGRAMS = opt1 opt2 unsignedoverflow signedoverflow \
 	signedloop unsignedloop safesignedloop tablelookup wtf
-ALLPROGRAMS = $(PROGRAMS)
+ALLPROGRAMS = $(PROGRAMS) accessor
 
 variants = $(1) $(addsuffix -noopt,$(1)) \
 	$(addsuffix -clang,$(1)) $(addsuffix -clang-noopt,$(1)) \
@@ -66,6 +60,12 @@ $(addsuffix -gcc-noopt,$(BASEPROGRAMS)): \
 $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 %: %.o hexdump-clang-noopt.o
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
+
+
+mb0 mb1 mb2 mb2s mb3 mb4: \
+%: %.o mbdriver.o hexdump.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+
 
 
 clean:
