@@ -11,6 +11,6 @@
     return identity(x) + identity(x + 1);
 }
 
-int main(int argc, char* argv[]) {
+int main() {
     printf("%d\n", f(61));
 }

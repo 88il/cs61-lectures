@@ -1,9 +1,9 @@
 //! -O1
 
-int f(int a, int b, int c) {
+unsigned f(unsigned a, unsigned b, unsigned c) {
     if (a >= b && a >= c) {
         return a;
-    } else if (b >= a && b >= c) {
+    } else if (b >= c) {
         return b;
     } else {
         return c;
