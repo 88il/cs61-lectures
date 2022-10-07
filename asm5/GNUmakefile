@@ -10,7 +10,7 @@ variants = $(1) $(addsuffix -san,$(1)) $(addsuffix -noopt,$(1)) \
 	$(addsuffix -gcc,$(1)) $(addsuffix -gcc-noopt,$(1))
 
 NEED_CXX_GCC = 1
-CXXFLAGS += -mtune=native
+CXXFLAGS += -march=native -mtune=native
 O ?= 1
 include ../common/rules.mk
 
