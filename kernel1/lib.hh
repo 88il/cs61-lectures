@@ -22,11 +22,13 @@ size_t strlen(const char* s);
 size_t strnlen(const char* s, size_t maxlen);
 char* strcpy(char* dst, const char* src);
 char* strncpy(char* dst, const char* src, size_t maxlen);
+size_t strlcpy(char* dst, const char* src, size_t maxlen);
 int strcmp(const char* a, const char* b);
 int strncmp(const char* a, const char* b, size_t maxlen);
 int strcasecmp(const char* a, const char* b);
 int strncasecmp(const char* a, const char* b, size_t maxlen);
 char* strchr(const char* s, int c);
+char* strstr(const char* haystack, const char* needle);
 long strtol(const char* s, char** endptr = nullptr, int base = 0);
 unsigned long strtoul(const char* s, char** endptr = nullptr, int base = 0);
 ssize_t snprintf(char* s, size_t size, const char* format, ...);
@@ -45,6 +47,15 @@ inline int toupper(int c);
 int rand();
 void srand(unsigned seed);
 int rand(int min, int max);
+
+struct from_chars_result {
+    const char* ptr;
+    int ec;
+};
+from_chars_result from_chars(const char* first, const char* last,
+                             long& value, int base = 10);
+from_chars_result from_chars(const char* first, const char* last,
+                             unsigned long& value, int base = 10);
 
 
 // Return the offset of `member` relative to the beginning of a struct type
@@ -214,6 +225,18 @@ inline uint32_t crc32c(const void* buf, size_t sz) {
 #define SYSCALL_EXIT            7
 
 
+// System call error return values
+
+#define E_INVAL         -22        // Invalid argument
+#define E_RANGE         -34        // Out of range
+
+#define E_MINERROR      -100
+
+inline bool is_error(uintptr_t r) {
+    return r >= static_cast<uintptr_t>(E_MINERROR);
+}
+
+
 // CGA console printing
 
 #define CPOS(row, col)  ((row) * 80 + (col))
@@ -222,7 +245,7 @@ inline uint32_t crc32c(const void* buf, size_t sz) {
 
 #define CONSOLE_COLUMNS 80
 #define CONSOLE_ROWS    25
-extern uint16_t console[CONSOLE_ROWS * CONSOLE_COLUMNS];
+extern volatile uint16_t console[CONSOLE_ROWS * CONSOLE_COLUMNS];
 
 // current position of the cursor (80 * ROW + COL)
 extern volatile int cursorpos;
@@ -235,7 +258,7 @@ void console_clear();
 
 
 // console_puts(cursor, color, s, len)
-//    Write a string to the CGA console.
+//    Write a string to the CGA console. Writes exactly `len` characters.
 //
 //    The `cursor` argument is a cursor position, such as `CPOS(r, c)`
 //    for row number `r` and column number `c`. The `color` argument

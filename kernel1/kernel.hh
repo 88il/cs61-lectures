@@ -8,6 +8,7 @@
 struct elf_header;
 struct elf_program;
 struct program_image_segment;
+struct vmiter;
 
 
 // kernel.hh
@@ -56,10 +57,13 @@ extern proc ptable[NPROC];
 //
 //    `physpages[I]` is a `physpageinfo` structure corresponding to the `I`th
 //    physical page (which contains physical addresses
-//    `[I*PAGESIZE,(I+1)*PAGESIZE)`). `physpages[I].refcount` represents the
-//    number of times physical page `I` is used.
+//    `[I*PAGESIZE,(I+1)*PAGESIZE)`). In the handout code,
+//    `physpages[I].refcount` represents the number of times physical page `I`
+//    is used. Free pages have `refcount == 0`, and (since handout processes
+//    never share memory) allocated pages have `refcount == 1`.
 //
-//    The memory viewer relies on `refcount == 0` indicating free pages.
+//    You can add more information to `physpageinfo` if you need to, but the
+//    memory viewer relies on `refcount == 0` indicating free pages.
 struct physpageinfo {
     uint8_t refcount = 0;
 
@@ -256,9 +260,19 @@ struct program_image_segment {
 //    Reboot the virtual machine.
 [[noreturn]] void reboot();
 
-// user_panic
-//    Panic initiated by a user process.
-[[noreturn]] void user_panic(proc* p);
+// proc_panic(p, fmt, ...)
+//    Report a panic that happened due to a process & its registers.
+[[noreturn]] void proc_panic(const proc* p, const char* fmt, ...);
+
+// user_panic(p)
+//    Report a panic caused by a PROC_PANIC system call.
+[[noreturn]] void user_panic(const proc* p);
+
+
+// strlcpy_from_user
+//    Copy a C string from a `vmiter` into `buf`, only considering
+//    user-accessible mappings.
+void strlcpy_from_user(char* buf, vmiter it, size_t maxlen);
 
 
 // log_printf, log_vprintf
@@ -269,9 +283,9 @@ __noinline void log_vprintf(const char* format, va_list val);
 
 // log_backtrace
 //    Print a backtrace to the host's `log.txt` file, either for the current
-//    stack or for a given stack range.
+//    stack or for the stack active in `p`.
 void log_backtrace(const char* prefix = "");
-void log_backtrace(const char* prefix, uintptr_t rsp, uintptr_t rbp);
+void log_backtrace(const proc* p, const char* prefix = "");
 
 // lookup_symbol
 //    Read the hidden symbol table for the name of the kernel symbol at

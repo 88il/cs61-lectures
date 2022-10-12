@@ -2,7 +2,7 @@
 #include "k-apic.hh"
 #include "k-vmiter.hh"
 #include "obj/k-firstprocess.h"
-#include <atomic>
+#include "atomic.hh"
 
 // kernel.cc
 //
@@ -29,7 +29,7 @@ proc ptable[NPROC];             // array of process descriptors
 proc* current;                  // pointer to currently executing proc
 
 #define HZ 100                  // timer interrupt frequency (interrupts/sec)
-[[maybe_unused]] static std::atomic<unsigned long> ticks; // # timer interrupts so far
+[[maybe_unused]] static atomic<unsigned long> ticks; // # timer interrupts so far
 
 
 // Memory state - see `kernel.hh`
@@ -51,23 +51,27 @@ static void process_setup(pid_t pid, const char* program_name);
 void kernel_start(const char* command) {
     // initialize hardware
     init_hardware();
+    log_printf("Starting WeensyOS\n");
+
+    ticks = 1;
 
     // clear screen
     console_clear();
 
     // (re-)initialize kernel page table
-    for (vmiter it(kernel_pagetable, 0);
-         it.va() < MEMSIZE_PHYSICAL;
-         it += PAGESIZE) {
-        if (it.va() != 0) {
-            it.map(it.va(), PTE_P | PTE_W | PTE_U);
-        } else {
+    for (uintptr_t addr = 0; addr < MEMSIZE_PHYSICAL; addr += PAGESIZE) {
+        int perm = PTE_P | PTE_W | PTE_U;
+        if (addr == 0) {
             // nullptr is inaccessible even to the kernel
-            it.map(it.va(), 0);
+            perm = 0;
         }
+        // install identity mapping
+        int r = vmiter(kernel_pagetable, addr).try_map(addr, perm);
+        assert(r == 0); // mappings during kernel_start MUST NOT fail
+                        // (Note that later mappings might fail!!)
     }
 
-    // set up process descriptors and run first processes
+    // set up process descriptors
     for (pid_t i = 0; i < NPROC; i++) {
         ptable[i].pid = i;
         ptable[i].state = P_FREE;
@@ -81,6 +85,8 @@ void kernel_start(const char* command) {
         process_setup(1, "alice");
         process_setup(2, "eve");
     }
+
+    // switch to first process using run()
     run(&ptable[1]);
 }
 
@@ -101,21 +107,23 @@ void process_setup(pid_t pid, const char* program_name) {
     // initialize process page table
     ptable[pid].pagetable = kernel_pagetable;
 
-    // obtain reference to the program image
+    // obtain reference to program image
+    // (The program image models the process executable.)
     program_image pgm(program_name);
 
-    // allocate and map all memory
+    // allocate process memory as specified in program image
     for (auto seg = pgm.begin(); seg != pgm.end(); ++seg) {
         for (uintptr_t a = round_down(seg.va(), PAGESIZE);
              a < seg.va() + seg.size();
              a += PAGESIZE) {
+            // `a` is the process virtual address for the next code or data page
             assert(a >= first_addr && a < last_addr);
             assert(physpages[a / PAGESIZE].refcount == 0);
             ++physpages[a / PAGESIZE].refcount;
         }
     }
 
-    // copy instructions and data into place
+    // copy instructions and data from program image into process memory
     for (auto seg = pgm.begin(); seg != pgm.end(); ++seg) {
         memset((void*) seg.va(), 0, seg.size());
         memcpy((void*) seg.va(), seg.data(), seg.data_size());
@@ -124,7 +132,7 @@ void process_setup(pid_t pid, const char* program_name) {
     // mark entry point
     ptable[pid].regs.reg_rip = pgm.entry();
 
-    // allocate stack
+    // allocate stack segment
     uintptr_t stack_addr = last_addr - PAGESIZE;
     assert(physpages[stack_addr / PAGESIZE].refcount == 0);
     ++physpages[stack_addr / PAGESIZE].refcount;
@@ -157,8 +165,8 @@ void exception(regstate* regs) {
 
     // It can be useful to log events using `log_printf`.
     // Events logged this way are stored in the host's `log.txt` file.
-    //log_printf("proc %d: exception %d at rip %p\n",
-    //           current->pid, regs->reg_intno, regs->reg_rip);
+    /* log_printf("proc %d: exception %d at rip %p\n",
+                current->pid, regs->reg_intno, regs->reg_rip); */
 
     // Show the current cursor location.
     console_show_cursor(cursorpos);
@@ -173,16 +181,18 @@ void exception(regstate* regs) {
     case INT_PF: {
         // Analyze faulting address and access type.
         uintptr_t addr = rdcr2();
-        const char* entity = regs->reg_errcode & PTE_U
-                ? "Process" : "Kernel";
         const char* operation = regs->reg_errcode & PTE_W
                 ? "write" : "read";
         const char* problem = regs->reg_errcode & PTE_P
                 ? "protection problem" : "missing page";
 
+        if (!(regs->reg_errcode & PTE_U)) {
+            proc_panic(current, "Kernel page fault on %p (%s %s, rip=%p)!\n",
+                       addr, operation, problem, regs->reg_rip);
+        }
         error_printf(CPOS(24, 0), COLOR_ERROR,
-            "%s %d page fault on %p (%s %s, rip=%p)!\n",
-            entity, current->pid, addr, operation, problem, regs->reg_rip);
+            "Process %d page fault on %p (%s %s, rip=%p)!\n",
+            current->pid, addr, operation, problem, regs->reg_rip);
         goto unhandled;
     }
 
@@ -196,7 +206,8 @@ void exception(regstate* regs) {
 
     default:
     unhandled:
-        panic("Unexpected exception %d!\n", regs->reg_intno);
+        proc_panic(current, "Unhandled exception %d (rip=%p)!\n",
+                   regs->reg_intno, regs->reg_rip);
 
     }
 
@@ -211,10 +222,18 @@ void exception(regstate* regs) {
 
 
 // syscall(regs)
-//    System call handler.
+//    Handle a system call initiated by a `syscall` instruction.
+//    The process’s register values at system call time are accessible in
+//    `regs`.
 //
-//    The register values from system call time are stored in `regs`.
-//    The return value, if any, is returned to the user process in `%rax`.
+//    If this function returns with value `V`, then the user process will
+//    resume with `V` stored in `%rax` (so the system call effectively
+//    returns `V`). Alternately, the kernel can exit this function by
+//    calling `schedule()`, perhaps after storing the eventual system call
+//    return value in `current->regs.reg_rax`.
+//
+//    It is only valid to return from this function if
+//    `current->state == P_RUNNABLE`.
 //
 //    Note that hardware interrupts are disabled when the kernel is running.
 
@@ -225,10 +244,10 @@ uintptr_t syscall(regstate* regs) {
 
     // It can be useful to log events using `log_printf`.
     // Events logged this way are stored in the host's `log.txt` file.
-    //log_printf("proc %d: syscall %d at rip %p\n",
-    //           current->pid, regs->reg_rax, regs->reg_rip);
+    /* log_printf("proc %d: syscall %d at rip %p\n",
+                  current->pid, regs->reg_rax, regs->reg_rip); */
 
-    // Show the current cursor location
+    // Show the current cursor location.
     console_show_cursor(cursorpos);
 
     // If Control-C was typed, exit the virtual machine.
@@ -263,7 +282,8 @@ uintptr_t syscall(regstate* regs) {
     }
 
     default:
-        panic("Unexpected system call %ld!\n", regs->reg_rax);
+        proc_panic(current, "Unhandled system call %ld (pid=%d, rip=%p)!\n",
+                   regs->reg_rax, current->pid, regs->reg_rip);
 
     }
 
