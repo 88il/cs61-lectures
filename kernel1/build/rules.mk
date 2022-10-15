@@ -27,8 +27,8 @@ HOSTCC  = cc
 HOSTCXX = c++
 TAR     = tar
 PERL    = perl
-HOSTCFLAGS := $(CFLAGS) -std=gnu11 -Wall -W
-HOSTCXXFLAGS := $(CXXFLAGS) -std=gnu++1z -Wall -W
+HOSTCFLAGS := $(CFLAGS) -std=gnu2x -Wall -W
+HOSTCXXFLAGS := $(CXXFLAGS) -std=gnu++2a -Wall -W
 
 # Compiler flags
 # -Os is required for the boot loader to fit within 512 bytes;
@@ -43,8 +43,8 @@ CCOMMONFLAGS := -m64 -mno-mmx -mno-sse -mno-sse2 -mno-sse3 \
 
 ASFLAGS := $(CCOMMONFLAGS)
 ASFLAGS += $(shell $(CXX) -no-integrated-as -E -x c /dev/null >/dev/null 2>&1 && echo -no-integrated-as)
-CFLAGS := $(CFLAGS) $(CCOMMONFLAGS) -std=gnu11 -gdwarf
-CXXFLAGS := $(CXXFLAGS) $(CCOMMONFLAGS) -std=gnu++1z \
+CFLAGS := $(CFLAGS) $(CCOMMONFLAGS) -std=gnu2x -gdwarf
+CXXFLAGS := $(CXXFLAGS) $(CCOMMONFLAGS) -std=gnu++2a \
 	-fno-exceptions -fno-rtti -gdwarf -ffunction-sections
 DEPCFLAGS = -MD -MF $(DEPSDIR)/$(@F).d -MP
 
@@ -91,8 +91,8 @@ $(OBJDIR)/stamp $(BUILDSTAMP):
 	$(call run,mkdir -p $(@D))
 	$(call run,touch $@)
 
-ifneq ($(strip $(INITFS_CONTENTS) $(INITFS_PARAMS)),$(DEP_INITFS_CONTENTS))
-INITFS_BUILDSTAMP := $(shell echo "DEP_INITFS_CONTENTS:=$(strip $(INITFS_CONTENTS) $(INITFS_PARAMS))" > $(DEPSDIR)/_initfs.d; echo always)
+ifneq ($(strip $(PROCESSES)),$(DEP_PROCESSES))
+PROCESSES_BUILDSTAMP := $(shell echo "DEP_PROCESSES:=$(strip $(PROCESSES))" > $(DEPSDIR)/_processes.d; echo always)
 endif
 
 ifneq ($(strip $(DISKFS_CONTENTS)),$(DEP_DISKFS_CONTENTS))

@@ -14,7 +14,7 @@ void process_main() {
     int x_incr = incr(x);
     assert(x_incr > x);
 
-    char buf[BUFSIZ];
+    char buf[512];
     size_t n = snprintf(buf, sizeof(buf), "assertion passed, so %d > %d\n", x_incr, x);
     ssize_t nw = sys_write(buf, n);
     assert((size_t) nw == n);

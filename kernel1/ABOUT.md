@@ -67,7 +67,7 @@ OS has become unresponsive).
 * If QEMU is running in its own graphical window, then close the window. This
   will kill the embedded OS.
 
-* Open another terminal, change into the WeensyOS directory and run `make
+* Open another terminal, change into the WeensyOS directory, and run `make
   kill` to stop all running QEMUs. If you are using Docker, you will need to
   enter Docker via `../cs61-run-docker` before running `make kill`.
 

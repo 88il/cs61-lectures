@@ -5,7 +5,7 @@
 #include "k-pci.hh"
 #include "k-vmiter.hh"
 #include "obj/k-foreachimage.h"
-#include <atomic>
+#include "atomic.hh"
 
 
 // k-hardware.cc
@@ -687,22 +687,30 @@ bool lookup_symbol(uintptr_t addr, const char** name, uintptr_t* start) {
 
 namespace {
 struct backtracer {
-    backtracer(uintptr_t rbp, uintptr_t rsp, uintptr_t stack_top)
-        : rbp_(rbp), rsp_(rsp), stack_top_(stack_top) {
-        pt_ = pa2kptr<x86_64_pagetable*>(rdcr3());
+    backtracer(const regstate& regs, x86_64_pagetable* pt)
+        : backtracer(regs, round_up(regs.reg_rsp, PAGESIZE), pt) {
+    }
+    backtracer(const regstate& regs, uintptr_t stack_top,
+               x86_64_pagetable* pt)
+        : rbp_(regs.reg_rbp), rsp_(regs.reg_rsp), stack_top_(stack_top),
+          pt_(pt) {
         check();
     }
     bool ok() const {
         return rsp_ != 0;
     }
+    uintptr_t rbp() const {
+        return rbp_;
+    }
+    uintptr_t rsp() const {
+        return rsp_;
+    }
     uintptr_t ret_rip() const {
-        uintptr_t* rbpx = reinterpret_cast<uintptr_t*>(rbp_);
-        return rbpx[1];
+        return deref_rbp(8);
     }
     void step() {
-        uintptr_t* rbpx = reinterpret_cast<uintptr_t*>(rbp_);
         rsp_ = rbp_ + 16;
-        rbp_ = rbpx[0];
+        rbp_ = deref_rbp(0);
         check();
     }
 
@@ -714,30 +722,29 @@ private:
 
     void check() {
         if (rbp_ < rsp_
+            || stack_top_ < rbp_
             || stack_top_ - rbp_ < 16
-            || ((vmiter(pt_, rbp_).range_perm(16)) & PTE_P) == 0) {
+            || !pt_
+            || (vmiter(pt_, rbp_).range_perm(16) & PTE_P) == 0
+            || (rbp_ & 7) != 0) {
             rbp_ = rsp_ = 0;
         }
+    }
+
+    uintptr_t deref_rbp(uintptr_t off) const {
+        return *vmiter(pt_, rbp_ + off).kptr<const uintptr_t*>();
     }
 };
 }
 
-// log_backtrace(prefix[, rsp, rbp])
-//    Print a backtrace to `log.txt`, each line prefixed by `prefix`.
 
-void log_backtrace(const char* prefix) {
-    log_backtrace(prefix, rdrsp(), rdrbp());
-}
-
-void log_backtrace(const char* prefix, uintptr_t rsp, uintptr_t rbp) {
-    if (rsp != rbp && round_up(rsp, PAGESIZE) == round_down(rbp, PAGESIZE)) {
+static void log_backtrace(backtracer& bt, const char* prefix) {
+    if (bt.rsp() != bt.rbp()
+        && round_up(bt.rsp(), PAGESIZE) == round_down(bt.rbp(), PAGESIZE)) {
         log_printf("%s  warning: possible stack overflow (rsp %p, rbp %p)\n",
-                   rsp, rbp);
+                   prefix, bt.rsp(), bt.rbp());
     }
-    int frame = 1;
-    for (backtracer bt(rbp, rsp, round_up(rsp, PAGESIZE));
-         bt.ok();
-         bt.step(), ++frame) {
+    for (int frame = 1; bt.ok(); bt.step(), ++frame) {
         uintptr_t ret_rip = bt.ret_rip();
         const char* name;
         if (lookup_symbol(ret_rip, &name, nullptr)) {
@@ -746,6 +753,33 @@ void log_backtrace(const char* prefix, uintptr_t rsp, uintptr_t rbp) {
             log_printf("%s  #%d  %p\n", prefix, frame, ret_rip);
         }
     }
+}
+
+__always_inline const regstate& backtrace_current_regs() {
+    // static so we don't use stack space; stack might be full
+    static regstate backtrace_kernel_regs;
+    backtrace_kernel_regs.reg_rsp = rdrsp();
+    backtrace_kernel_regs.reg_rbp = rdrbp();
+    backtrace_kernel_regs.reg_rip = 0;
+    return backtrace_kernel_regs;
+}
+
+__always_inline x86_64_pagetable* backtrace_current_pagetable() {
+    return pa2kptr<x86_64_pagetable*>(rdcr3());
+}
+
+
+// log_backtrace([proc,] prefix)
+//    Print a backtrace to `log.txt`, each line prefixed by `prefix`.
+
+void log_backtrace(const char* prefix) {
+    backtracer bt(backtrace_current_regs(), backtrace_current_pagetable());
+    log_backtrace(bt, prefix);
+}
+
+void log_backtrace(const proc* p, const char* prefix) {
+    backtracer bt(p->regs, p->pagetable);
+    log_backtrace(bt, prefix);
 }
 
 
@@ -759,9 +793,6 @@ int error_vprintf(int cpos, int color, const char* format, va_list val) {
     __builtin_va_copy(val2, val);
     log_vprintf(format, val2);
     va_end(val2);
-    if (cpos < 0 && cursorpos < CPOS(24, 0)) {
-        cursorpos = CPOS(24, 0);
-    }
     return console_vprintf(cpos, color, format, val);
 }
 
@@ -815,8 +846,8 @@ int check_keyboard() {
         uintptr_t data_size = (uintptr_t) _edata - (uintptr_t) _data_start;
         uintptr_t zero_size = (uintptr_t) _kernel_end - (uintptr_t) _edata;
         uint8_t* data_stash = (uint8_t*) (SYMTAB_ADDR - data_size);
-        memcpy(&_data_start, data_stash, data_size);
-        memset(&_edata, 0, zero_size);
+        memcpy(_data_start, data_stash, data_size);
+        memset(_edata, 0, zero_size);
         // restart kernel
         asm volatile("movl $0x2BADB002, %%eax; jmp kernel_entry"
                      : : "b" (multiboot_info) : "memory");
@@ -837,20 +868,48 @@ int check_keyboard() {
 }
 
 
-// panic, assert_fail
+// strlcpy_from_user(buf, it, maxlen)
+//    Copy a C string from `it` into `buf`. Copies at most `maxlen-1`
+//    characters, then null-terminates the string. Stops at first
+//    absent or non-user-accessible byte.
+
+void strlcpy_from_user(char* buf, vmiter it, size_t maxlen) {
+    size_t i = 0;
+    while (i + 1 < maxlen && it.user()) {
+        buf[i] = *it.kptr<const char*>();
+        ++i, ++it;
+    }
+    if (i < maxlen) {
+        buf[i] = '\0';
+    }
+}
+
+
+// panic, proc_panic, user_panic, assert_fail
 //    Use console_printf() to print a failure message and then wait for
 //    control-C. Also write the failure message to the log.
 
-std::atomic<bool> panicking;
+atomic<bool> panicking;
 
-static void error_print_backtrace(uintptr_t rsp, uintptr_t rbp) {
-    int frame = 1;
-    for (backtracer bt(rbp, rsp, round_up(rsp, PAGESIZE));
-         bt.ok();
-         bt.step(), ++frame) {
+static void error_print_backtrace(const regstate& regs,
+                                  x86_64_pagetable* pt,
+                                  bool include_rip) {
+    if (CCOL(cursorpos)) {
+        error_printf("\n");
+    }
+    if (include_rip && regs.reg_rip) {
+        const char* name;
+        if (lookup_symbol(regs.reg_rip, &name, nullptr)) {
+            error_printf("  #0  %p  <%s>\n", regs.reg_rip, name);
+        } else {
+            error_printf("  #0  %p\n", regs.reg_rip);
+        }
+    }
+    backtracer bt(regs, pt);
+    for (int frame = 1; bt.ok(); bt.step(), ++frame) {
         uintptr_t ret_rip = bt.ret_rip();
         const char* name;
-        if (lookup_symbol(ret_rip, &name, nullptr)) {
+        if (lookup_symbol(ret_rip - 2, &name, nullptr)) {
             error_printf("  #%d  %p  <%s>\n", frame, ret_rip, name);
         } else {
             error_printf("  #%d  %p\n", frame, ret_rip);
@@ -858,66 +917,61 @@ static void error_print_backtrace(uintptr_t rsp, uintptr_t rbp) {
     }
 }
 
-static void vpanic(uintptr_t rsp, uintptr_t rbp, uintptr_t rip,
-                   const char* format, va_list val) {
-    panicking = true;
-
-    cursorpos = CPOS(24, 80);
-    if (format) {
-        // Print panic message to both the screen and the log
-        error_printf(-1, COLOR_ERROR, "PANIC: ");
-        error_vprintf(-1, COLOR_ERROR, format, val);
-        if (CCOL(cursorpos)) {
-            error_printf(-1, COLOR_ERROR, "\n");
-        }
-    } else {
-        error_printf(-1, COLOR_ERROR, "PANIC");
-        log_printf("\n");
-    }
-
-    if (rip) {
-        const char* name;
-        if (lookup_symbol(rip, &name, nullptr)) {
-            error_printf("  #0  %p  <%s>\n", rip, name);
-        } else {
-            error_printf("  #0  %p\n", rip);
-        }
-    }
-    error_print_backtrace(rsp, rbp);
-}
-
 void panic(const char* format, ...) {
-    va_list val;
-    va_start(val, format);
-    vpanic(rdrsp(), rdrbp(), 0, format, val);
-    va_end(val);
-    fail();
-}
-
-[[noreturn]]
-static void panic(uintptr_t rsp, uintptr_t rbp, uintptr_t rip,
-                  const char* format, ...) {
-    va_list val;
-    va_start(val, format);
-    vpanic(rsp, rbp, rip, format, val);
-    va_end(val);
-    fail();
-}
-
-void user_panic(proc* p) {
-    char s[256];
-    memset(s, 0, sizeof(s));
-    if (p->regs.reg_rdi == 0) {
-        strcpy(s, "(null)");
-    } else {
-        vmiter it(p->pagetable, p->regs.reg_rdi);
-        for (size_t i = 0;
-             i < sizeof(s) - 1 && it.va() >= PROC_START_ADDR && it.user();
-             ++i, ++it) {
-            s[i] = *it.kptr<const char*>();
-        }
+    panicking = true;
+    cursorpos = CPOS(24, 80);
+    if (!format) {
+        format = "PANIC";
     }
-    panic(p->regs.reg_rsp, p->regs.reg_rbp, p->regs.reg_rip, "%s", s);
+    if (strstr(format, "PANIC") == nullptr) {
+        error_printf(-1, COLOR_ERROR, "PANIC: ");
+    }
+
+    va_list val;
+    va_start(val, format);
+    error_vprintf(-1, COLOR_ERROR, format, val);
+    va_end(val);
+
+    error_print_backtrace(backtrace_current_regs(), backtrace_current_pagetable(), false);
+    fail();
+}
+
+void proc_panic(const proc* p, const char* format, ...) {
+    panicking = true;
+    cursorpos = CPOS(24, 80);
+
+    va_list val;
+    va_start(val, format);
+    error_vprintf(-1, COLOR_ERROR, format, val);
+    va_end(val);
+
+    x86_64_pagetable* pt;
+    if ((p->regs.reg_cs & 3) == 0) {
+        pt = backtrace_current_pagetable();
+    } else {
+        pt = p->pagetable;
+    }
+    error_print_backtrace(p->regs, pt, true);
+    fail();
+}
+
+void user_panic(const proc* p) {
+    panicking = true;
+    cursorpos = CPOS(24, 80);
+    const char* fmt;
+    char buf[256];
+    memset(buf, 0, sizeof(buf));
+    if (p->regs.reg_rdi == 0) {
+        fmt = "USER PANIC";
+    } else {
+        strlcpy_from_user(buf, vmiter(p, p->regs.reg_rdi), sizeof(buf));
+        fmt = "USER PANIC: %s";
+    }
+
+    error_printf(-1, COLOR_ERROR, fmt, buf);
+
+    error_print_backtrace(p->regs, p->pagetable, true);
+    fail();
 }
 
 void assert_fail(const char* file, int line, const char* msg,
@@ -927,7 +981,7 @@ void assert_fail(const char* file, int line, const char* msg,
         error_printf("%s:%d: %s\n", file, line, description);
     }
     error_printf("%s:%d: kernel assertion '%s' failed\n", file, line, msg);
-    error_print_backtrace(rdrsp(), rdrbp());
+    error_print_backtrace(backtrace_current_regs(), backtrace_current_pagetable(), false);
     fail();
 }
 
@@ -1050,8 +1104,8 @@ extern "C" {
 //    initialized. Otherwise lock `*guard` and return 1. The compiler
 //    will initialize the statics, then call `__cxa_guard_release`.
 int __cxa_guard_acquire(long long* arg) {
-    std::atomic<char>* guard = reinterpret_cast<std::atomic<char>*>(arg);
-    if (guard->load(std::memory_order_relaxed) == 2) {
+    atomic<char>* guard = reinterpret_cast<atomic<char>*>(arg);
+    if (guard->load(memory_order_relaxed) == 2) {
         return 0;
     }
     while (true) {
@@ -1071,7 +1125,7 @@ int __cxa_guard_acquire(long long* arg) {
 //    Mark `guard` to indicate that the static variables it guards are
 //    initialized.
 void __cxa_guard_release(long long* arg) {
-    std::atomic<char>* guard = reinterpret_cast<std::atomic<char>*>(arg);
+    atomic<char>* guard = reinterpret_cast<atomic<char>*>(arg);
     guard->store(2);
 }
 

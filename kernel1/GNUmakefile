@@ -1,4 +1,4 @@
-QEMUIMAGEFILES = demoos.img
+QEMUIMAGEFILES = weensyos.img
 all: $(QEMUIMAGEFILES) attack
 
 # Place local configuration options, such as `CC=clang`, in
@@ -129,6 +129,8 @@ $(OBJDIR)/k-foreachimage.h: build/mkforeachimage.awk $(PROCESSES_BUILDSTAMP)
 $(OBJDIR)/firstprocess.gdb:
 	$(call run,if test "$(WEENSYOS_FIRST_PROCESS)" = friends; then echo "add-symbol-file obj/p-alice.full 0x100000"; echo "add-symbol-file obj/p-eve.full 0x140000"; else echo "add-symbol-file obj/p-$(WEENSYOS_FIRST_PROCESS).full 0x100000"; fi > $@,CREATE $@)
 
+$(OBJDIR)/k-hardware.ko: $(OBJDIR)/k-foreachimage.h
+
 
 # How to make binaries and the boot sector
 
@@ -180,7 +182,7 @@ $(OBJDIR)/mkbootdisk: build/mkbootdisk.cc $(BUILDSTAMPS)
 	$(call run,$(HOSTCXX) $(CPPFLAGS) $(HOSTCXXFLAGS) $(DEPCFLAGS) -g -o $@,HOSTCOMPILE,$<)
 
 
-demoos.img: $(OBJDIR)/mkbootdisk $(OBJDIR)/bootsector $(OBJDIR)/kernel
+weensyos.img: $(OBJDIR)/mkbootdisk $(OBJDIR)/bootsector $(OBJDIR)/kernel
 	$(call run,$(OBJDIR)/mkbootdisk $(OBJDIR)/bootsector $(OBJDIR)/kernel > $@,CREATE $@)
 
 
@@ -194,7 +196,7 @@ attack: attack.cc $(BUILDSTAMPS)
 
 QEMUIMG = -M q35 \
 	-device piix4-ide,bus=pcie.0,id=piix4-ide \
-	-drive file=demoos.img,if=none,format=raw,id=bootdisk \
+	-drive file=weensyos.img,if=none,format=raw,id=bootdisk \
 	-device ide-hd,drive=bootdisk,bus=piix4-ide.0
 
 run: run-$(QEMUDISPLAY)
@@ -211,9 +213,9 @@ run-gdb: run-gdb-$(QEMUDISPLAY)
 	@:
 run-gdb-graphic: $(QEMUIMAGEFILES) $(GDBFILES) check-qemu
 	$(call run,$(QEMU_PRELOAD) $(QEMU) $(QEMUOPT) -gdb tcp::12949 $(QEMUIMG) &,QEMU $<)
-	$(call run,sleep 0.5; gdb -x build/weensyos.gdb,GDB)
+	$(call run,sleep 0.5; gdb -ix weensyos.gdb,GDB)
 run-gdb-console: $(QEMUIMAGEFILES) $(GDBFILES) check-qemu-console
-	$(call run,$(QEMU) $(QEMUOPT) -S -display curses -gdb tcp::12949 $(QEMUIMG),QEMU $<)
+	$(call run,$(QEMU) $(QEMUOPT) -display curses -gdb tcp::12949 $(QEMUIMG),QEMU $<)
 
 run-$(RUNSUFFIX): run
 run-graphic-$(RUNSUFFIX): run-graphic
