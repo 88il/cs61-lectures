@@ -64,7 +64,7 @@ PROCESS_LINKER_FILES = build/process.ld
 RUNCMD_LASTWORD := $(filter run-%,$(MAKECMDGOALS))
 ifeq ($(words $(RUNCMD_LASTWORD)),1)
 RUNCMD_LASTWORD := $(lastword $(subst -, ,$(RUNCMD_LASTWORD)))
-ifneq ($(filter p-$(RUNCMD_LASTWORD),$(PROCESSES)),)
+ifneq ($(filter p-$(RUNCMD_LASTWORD),$(PROCESSES) p-friends),)
 RUNSUFFIX := $(RUNCMD_LASTWORD)
 WEENSYOS_FIRST_PROCESS := $(RUNCMD_LASTWORD)
 endif
