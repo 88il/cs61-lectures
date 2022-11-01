@@ -1,5 +1,5 @@
 QEMUIMAGEFILES = weensyos.img
-all: $(QEMUIMAGEFILES) attack
+all: $(QEMUIMAGEFILES)
 
 # Place local configuration options, such as `CC=clang`, in
 # `config.mk` so you don't have to list them every time.
@@ -47,7 +47,7 @@ BOOT_OBJS = $(OBJDIR)/bootentry.o $(OBJDIR)/boot.o
 
 KERNEL_OBJS = $(OBJDIR)/k-exception.ko \
 	$(OBJDIR)/kernel.ko $(OBJDIR)/k-vmiter.ko \
-	$(OBJDIR)/k-hardware.ko \
+	$(OBJDIR)/k-hardware.ko $(OBJDIR)/k-memviewer.ko \
 	$(OBJDIR)/lib.ko
 KERNEL_LINKER_FILES = build/kernel.ld
 
@@ -64,12 +64,12 @@ PROCESS_LINKER_FILES = build/process.ld
 RUNCMD_LASTWORD := $(filter run-%,$(MAKECMDGOALS))
 ifeq ($(words $(RUNCMD_LASTWORD)),1)
 RUNCMD_LASTWORD := $(lastword $(subst -, ,$(RUNCMD_LASTWORD)))
-ifneq ($(filter p-$(RUNCMD_LASTWORD),$(PROCESSES) p-friends),)
+ifneq ($(filter p-$(RUNCMD_LASTWORD),$(PROCESSES) p-friends p-pipe),)
 RUNSUFFIX := $(RUNCMD_LASTWORD)
 WEENSYOS_FIRST_PROCESS := $(RUNCMD_LASTWORD)
 endif
 endif
-WEENSYOS_FIRST_PROCESS ?= friends
+WEENSYOS_FIRST_PROCESS ?= pipe
 
 ifneq ($(strip $(WEENSYOS_FIRST_PROCESS)),$(DEP_WEENSYOS_FIRST_PROCESS))
 FIRST_PROCESS_BUILDSTAMP := $(shell echo "DEP_WEENSYOS_FIRST_PROCESS:=$(WEENSYOS_FIRST_PROCESS)" > $(DEPSDIR)/_first_process.d)
@@ -127,7 +127,7 @@ $(OBJDIR)/k-foreachimage.h: build/mkforeachimage.awk $(PROCESSES_BUILDSTAMP)
 	$(call run,awk -f build/mkforeachimage.awk -v processes="$(PROCESSES)" > $@,CREATE $@)
 
 $(OBJDIR)/firstprocess.gdb:
-	$(call run,if test "$(WEENSYOS_FIRST_PROCESS)" = friends; then echo "add-symbol-file obj/p-alice.full 0x100000"; echo "add-symbol-file obj/p-eve.full 0x140000"; else echo "add-symbol-file obj/p-$(WEENSYOS_FIRST_PROCESS).full 0x100000"; fi > $@,CREATE $@)
+	$(call run,if test "$(WEENSYOS_FIRST_PROCESS)" = allocators; then echo "add-symbol-file obj/p-allocator.full 0x100000"; echo "add-symbol-file obj/p-allocator2.full 0x140000"; echo "add-symbol-file obj/p-allocator3.full 0x180000"; echo "add-symbol-file obj/p-allocator4.full 0x1C0000"; else echo "add-symbol-file obj/p-$(WEENSYOS_FIRST_PROCESS).full 0x100000"; fi > $@,CREATE $@)
 
 $(OBJDIR)/k-hardware.ko: $(OBJDIR)/k-foreachimage.h
 
@@ -142,7 +142,7 @@ $(OBJDIR)/kernel.full: $(KERNEL_OBJS) $(PROCESS_BINARIES) $(KERNEL_LINKER_FILES)
 $(OBJDIR)/p-%.full: $(OBJDIR)/p-%.uo $(PROCESS_LIB_OBJS) $(PROCESS_LINKER_FILES)
 	$(call link,-T $(PROCESS_LINKER_FILES) -o $@ $< $(PROCESS_LIB_OBJS),LINK)
 
-$(OBJDIR)/p-eve.full $(OBJDIR)/p-spawn.full: \
+$(OBJDIR)/p-eve.full $(OBJDIR)/p-reader.full $(OBJDIR)/p-spawn.full: \
 $(OBJDIR)/p-%.full: $(OBJDIR)/p-%.uo $(PROCESS_LIB_OBJS) build/process2.ld
 	$(call link,-T build/process2.ld -o $@ $< $(PROCESS_LIB_OBJS),LINK)
 
@@ -184,12 +184,6 @@ $(OBJDIR)/mkbootdisk: build/mkbootdisk.cc $(BUILDSTAMPS)
 
 weensyos.img: $(OBJDIR)/mkbootdisk $(OBJDIR)/bootsector $(OBJDIR)/kernel
 	$(call run,$(OBJDIR)/mkbootdisk $(OBJDIR)/bootsector $(OBJDIR)/kernel > $@,CREATE $@)
-
-
-# How to make `attack`
-
-attack: attack.cc $(BUILDSTAMPS)
-	$(call run,$(HOSTCXX) $(CPPFLAGS) $(HOSTCXXFLAGS) $(DEPCFLAGS) -o $@,HOSTCOMPILE,$<)
 
 
 # How to run QEMU
