@@ -1,11 +1,12 @@
-	.file	"f18.cc"
-	.text
-	.globl	_Z9ptr_arithPil
-	.type	_Z9ptr_arithPil, @function
-_Z9ptr_arithPil:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z9ptr_arithPil                ## -- Begin function _Z9ptr_arithPil
+__Z9ptr_arithPil:                       ## @_Z9ptr_arithPil
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	leaq	(%rdi,%rsi,4), %rax
-	ret
-	.size	_Z9ptr_arithPil, .-_Z9ptr_arithPil
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

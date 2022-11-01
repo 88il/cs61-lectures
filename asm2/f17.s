@@ -1,11 +1,12 @@
-	.file	"f17.cc"
-	.text
-	.globl	_Z12array_accessP2prl
-	.type	_Z12array_accessP2prl, @function
-_Z12array_accessP2prl:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z12array_accessP2prl          ## -- Begin function _Z12array_accessP2prl
+__Z12array_accessP2prl:                 ## @_Z12array_accessP2prl
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movl	(%rdi,%rsi,8), %eax
-	ret
-	.size	_Z12array_accessP2prl, .-_Z12array_accessP2prl
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

@@ -1,11 +1,12 @@
-	.file	"f08.cc"
-	.text
-	.globl	_Z1fv
-	.type	_Z1fv, @function
-_Z1fv:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fv                          ## -- Begin function _Z1fv
+__Z1fv:                                 ## @_Z1fv
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	xorl	%eax, %eax
-	ret
-	.size	_Z1fv, .-_Z1fv
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

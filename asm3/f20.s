@@ -1,15 +1,16 @@
-	.file	"f20.cc"
-	.text
-	.globl	_Z1fPKc
-	.type	_Z1fPKc, @function
-_Z1fPKc:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fPKc                        ## -- Begin function _Z1fPKc
+__Z1fPKc:                               ## @_Z1fPKc
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	pushq	%rbx
+	pushq	%rax
 	movq	%rdi, %rbx
-.L2:
+LBB0_1:                                 ## =>This Inner Loop Header: Depth=1
 	movq	%rbx, %rdi
-	call	puts@PLT
-	jmp	.L2
-	.size	_Z1fPKc, .-_Z1fPKc
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	callq	_puts
+	jmp	LBB0_1
+                                        ## -- End function
+.subsections_via_symbols

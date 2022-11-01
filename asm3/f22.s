@@ -1,19 +1,17 @@
-	.file	"f22.cc"
-	.text
-	.globl	_Z1fPKc
-	.type	_Z1fPKc, @function
-_Z1fPKc:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fPKc                        ## -- Begin function _Z1fPKc
+__Z1fPKc:                               ## @_Z1fPKc
+## %bb.0:
 	testq	%rdi, %rdi
-	je	.L7
-	subq	$8, %rsp
-	call	puts@PLT
+	je	LBB0_2
+## %bb.1:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	callq	_puts
+	popq	%rbp
+LBB0_2:
 	xorl	%eax, %eax
-	addq	$8, %rsp
-	ret
-.L7:
-	xorl	%eax, %eax
-	ret
-	.size	_Z1fPKc, .-_Z1fPKc
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	retq
+                                        ## -- End function
+.subsections_via_symbols

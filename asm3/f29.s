@@ -1,13 +1,14 @@
-	.file	"f29.cc"
-	.text
-	.globl	_Z1fiii
-	.type	_Z1fiii, @function
-_Z1fiii:
-	endbr64
-	imull	$1000, %edi, %edi
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fiii                        ## -- Begin function _Z1fiii
+__Z1fiii:                               ## @_Z1fiii
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	imull	$1000, %edi, %eax               ## imm = 0x3E8
 	imull	%edx, %esi
-	leal	(%rdi,%rsi), %eax
-	ret
-	.size	_Z1fiii, .-_Z1fiii
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	addl	%esi, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

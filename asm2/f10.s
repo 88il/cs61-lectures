@@ -1,28 +1,39 @@
-	.file	"f10.cc"
-	.text
-	.globl	_Z4sum1v
-	.type	_Z4sum1v, @function
-_Z4sum1v:
-	endbr64
-	movl	b1(%rip), %eax
-	addl	a1(%rip), %eax
-	ret
-	.size	_Z4sum1v, .-_Z4sum1v
-	.globl	_Z4sum2v
-	.type	_Z4sum2v, @function
-_Z4sum2v:
-	endbr64
-	movl	b2(%rip), %eax
-	addl	a2(%rip), %eax
-	ret
-	.size	_Z4sum2v, .-_Z4sum2v
-	.globl	_Z4sum3v
-	.type	_Z4sum3v, @function
-_Z4sum3v:
-	endbr64
-	movl	b3(%rip), %eax
-	addl	a3(%rip), %eax
-	ret
-	.size	_Z4sum3v, .-_Z4sum3v
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z4sum1v                       ## -- Begin function _Z4sum1v
+__Z4sum1v:                              ## @_Z4sum1v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a1@GOTPCREL(%rip), %rcx
+	movq	_b1@GOTPCREL(%rip), %rax
+	movl	(%rax), %eax
+	addl	(%rcx), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum2v                       ## -- Begin function _Z4sum2v
+__Z4sum2v:                              ## @_Z4sum2v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a2@GOTPCREL(%rip), %rcx
+	movq	_b2@GOTPCREL(%rip), %rax
+	movl	(%rax), %eax
+	addl	(%rcx), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum3v                       ## -- Begin function _Z4sum3v
+__Z4sum3v:                              ## @_Z4sum3v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a3@GOTPCREL(%rip), %rcx
+	movq	_b3@GOTPCREL(%rip), %rax
+	movl	(%rax), %eax
+	addl	(%rcx), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

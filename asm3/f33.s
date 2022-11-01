@@ -1,11 +1,12 @@
-	.file	"f33.cc"
-	.text
-	.globl	_Z1fi
-	.type	_Z1fi, @function
-_Z1fi:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fi                          ## -- Begin function _Z1fi
+__Z1fi:                                 ## @_Z1fi
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	addl	$1, %edi
-	jmp	_Z1gi@PLT
-	.size	_Z1fi, .-_Z1fi
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	jmp	__Z1gi                          ## TAILCALL
+                                        ## -- End function
+.subsections_via_symbols

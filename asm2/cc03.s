@@ -1,11 +1,12 @@
-	.file	"cc03.cc"
-	.text
-	.globl	_Z1f5small
-	.type	_Z1f5small, @function
-_Z1f5small:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1f5small                     ## -- Begin function _Z1f5small
+__Z1f5small:                            ## @_Z1f5small
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movsbl	%dil, %eax
-	ret
-	.size	_Z1f5small, .-_Z1f5small
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

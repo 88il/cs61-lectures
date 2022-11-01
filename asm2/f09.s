@@ -1,12 +1,15 @@
-	.file	"f09.cc"
-	.text
-	.globl	_Z3sumv
-	.type	_Z3sumv, @function
-_Z3sumv:
-	endbr64
-	movl	b(%rip), %eax
-	addl	a(%rip), %eax
-	ret
-	.size	_Z3sumv, .-_Z3sumv
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z3sumv                        ## -- Begin function _Z3sumv
+__Z3sumv:                               ## @_Z3sumv
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a@GOTPCREL(%rip), %rcx
+	movq	_b@GOTPCREL(%rip), %rax
+	movl	(%rax), %eax
+	addl	(%rcx), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

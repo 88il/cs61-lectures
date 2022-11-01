@@ -1,55 +1,78 @@
-	.file	"f12.cc"
-	.text
-	.globl	_Z4sum4v
-	.type	_Z4sum4v, @function
-_Z4sum4v:
-	endbr64
-	movzwl	a4(%rip), %eax
-	movzwl	b4(%rip), %edx
-	addl	%edx, %eax
-	ret
-	.size	_Z4sum4v, .-_Z4sum4v
-	.globl	_Z4sum5v
-	.type	_Z4sum5v, @function
-_Z4sum5v:
-	endbr64
-	movswl	a5(%rip), %eax
-	movswl	b5(%rip), %edx
-	addl	%edx, %eax
-	ret
-	.size	_Z4sum5v, .-_Z4sum5v
-	.globl	_Z4sum6v
-	.type	_Z4sum6v, @function
-_Z4sum6v:
-	endbr64
-	movzbl	a6(%rip), %eax
-	movzbl	b6(%rip), %edx
-	addl	%edx, %eax
-	ret
-	.size	_Z4sum6v, .-_Z4sum6v
-	.globl	_Z4sum7v
-	.type	_Z4sum7v, @function
-_Z4sum7v:
-	endbr64
-	movq	b7(%rip), %rax
-	addq	a7(%rip), %rax
-	ret
-	.size	_Z4sum7v, .-_Z4sum7v
-	.globl	_Z4sum8v
-	.type	_Z4sum8v, @function
-_Z4sum8v:
-	endbr64
-	movq	b8(%rip), %rax
-	addq	a8(%rip), %rax
-	ret
-	.size	_Z4sum8v, .-_Z4sum8v
-	.globl	_Z4sum9v
-	.type	_Z4sum9v, @function
-_Z4sum9v:
-	endbr64
-	movl	b9(%rip), %eax
-	addl	a9(%rip), %eax
-	ret
-	.size	_Z4sum9v, .-_Z4sum9v
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z4sum4v                       ## -- Begin function _Z4sum4v
+__Z4sum4v:                              ## @_Z4sum4v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a4@GOTPCREL(%rip), %rax
+	movzwl	(%rax), %ecx
+	movq	_b4@GOTPCREL(%rip), %rax
+	movzwl	(%rax), %eax
+	addl	%ecx, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum5v                       ## -- Begin function _Z4sum5v
+__Z4sum5v:                              ## @_Z4sum5v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a5@GOTPCREL(%rip), %rax
+	movswl	(%rax), %ecx
+	movq	_b5@GOTPCREL(%rip), %rax
+	movswl	(%rax), %eax
+	addl	%ecx, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum6v                       ## -- Begin function _Z4sum6v
+__Z4sum6v:                              ## @_Z4sum6v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a6@GOTPCREL(%rip), %rax
+	movzbl	(%rax), %ecx
+	movq	_b6@GOTPCREL(%rip), %rax
+	movzbl	(%rax), %eax
+	addl	%ecx, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum7v                       ## -- Begin function _Z4sum7v
+__Z4sum7v:                              ## @_Z4sum7v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a7@GOTPCREL(%rip), %rcx
+	movq	_b7@GOTPCREL(%rip), %rax
+	movq	(%rax), %rax
+	addq	(%rcx), %rax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum8v                       ## -- Begin function _Z4sum8v
+__Z4sum8v:                              ## @_Z4sum8v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a8@GOTPCREL(%rip), %rax
+	movq	(%rax), %rax
+	movq	_b8@GOTPCREL(%rip), %rcx
+	addq	(%rcx), %rax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z4sum9v                       ## -- Begin function _Z4sum9v
+__Z4sum9v:                              ## @_Z4sum9v
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	movq	_a9@GOTPCREL(%rip), %rcx
+	movq	_b9@GOTPCREL(%rip), %rax
+	movl	(%rax), %eax
+	addl	(%rcx), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

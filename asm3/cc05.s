@@ -1,23 +1,31 @@
-	.file	"cc05.cc"
-	.text
-	.globl	_Z8identityi
-	.type	_Z8identityi, @function
-_Z8identityi:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z8identityi                   ## -- Begin function _Z8identityi
+__Z8identityi:                          ## @_Z8identityi
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movl	%edi, %eax
-	ret
-	.size	_Z8identityi, .-_Z8identityi
-	.globl	_Z1fj
-	.type	_Z1fj, @function
-_Z1fj:
-	endbr64
-	movl	$61, -24(%rsp)
-	movl	$42981762, -20(%rsp)
-	movl	$391063, -16(%rsp)
-	movl	$2164, -12(%rsp)
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.globl	__Z1fj                          ## -- Begin function _Z1fj
+__Z1fj:                                 ## @_Z1fj
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+                                        ## kill: def $edi killed $edi def $rdi
 	andl	$3, %edi
-	movl	-24(%rsp,%rdi,4), %eax
-	ret
-	.size	_Z1fj, .-_Z1fj
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	leaq	L___const._Z1fj.local(%rip), %rax
+	movl	(%rax,%rdi,4), %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+	.section	__TEXT,__literal16,16byte_literals
+L___const._Z1fj.local:
+	.long	61                              ## 0x3d
+	.long	42981762                        ## 0x28fd982
+	.long	391063                          ## 0x5f797
+	.long	2164                            ## 0x874
+
+.subsections_via_symbols

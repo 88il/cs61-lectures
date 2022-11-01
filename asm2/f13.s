@@ -1,11 +1,12 @@
-	.file	"f13.cc"
-	.text
-	.globl	_Z1fP2pr
-	.type	_Z1fP2pr, @function
-_Z1fP2pr:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fP2pr                       ## -- Begin function _Z1fP2pr
+__Z1fP2pr:                              ## @_Z1fP2pr
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movl	(%rdi), %eax
-	ret
-	.size	_Z1fP2pr, .-_Z1fP2pr
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

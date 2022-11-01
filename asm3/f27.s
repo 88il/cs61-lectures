@@ -1,15 +1,19 @@
-	.file	"f27.cc"
-	.text
-	.globl	_Z1fjjj
-	.type	_Z1fjjj, @function
-_Z1fjjj:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fjjj                        ## -- Begin function _Z1fjjj
+__Z1fjjj:                               ## @_Z1fjjj
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	cmpl	%edx, %esi
-	cmovb	%edx, %esi
-	cmpl	%edi, %esi
+	movl	%esi, %ecx
+	cmovbl	%edx, %ecx
+	cmpl	%edx, %edi
 	movl	%edi, %eax
-	cmovnb	%esi, %eax
-	ret
-	.size	_Z1fjjj, .-_Z1fjjj
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	cmovbl	%ecx, %eax
+	cmpl	%esi, %edi
+	cmovbl	%ecx, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

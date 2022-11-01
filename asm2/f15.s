@@ -1,11 +1,12 @@
-	.file	"f15.cc"
-	.text
-	.globl	_Z12array_accessPil
-	.type	_Z12array_accessPil, @function
-_Z12array_accessPil:
-	endbr64
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z12array_accessPil            ## -- Begin function _Z12array_accessPil
+__Z12array_accessPil:                   ## @_Z12array_accessPil
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movl	(%rdi,%rsi,4), %eax
-	ret
-	.size	_Z12array_accessPil, .-_Z12array_accessPil
-	.ident	"GCC: (Ubuntu 11.2.0-17ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols

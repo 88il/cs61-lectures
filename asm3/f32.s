@@ -1,13 +1,14 @@
-	.file	"f32.cc"
-	.text
-	.globl	_Z8is_equalii
-	.type	_Z8is_equalii, @function
-_Z8is_equalii:
-	endbr64
-	xorl	%eax, %eax
-	cmpl	%esi, %edi
-	sete	%al
-	ret
-	.size	_Z8is_equalii, .-_Z8is_equalii
-	.ident	"GCC: (Ubuntu 11.2.0-19ubuntu1) 11.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	.section	__TEXT,__text,regular,pure_instructions
+	.build_version macos, 12, 0	sdk_version 12, 3
+	.globl	__Z1fi                          ## -- Begin function _Z1fi
+__Z1fi:                                 ## @_Z1fi
+## %bb.0:
+	pushq	%rbp
+	movq	%rsp, %rbp
+	addl	$1, %edi
+	callq	__Z1gi
+	addl	$-1, %eax
+	popq	%rbp
+	retq
+                                        ## -- End function
+.subsections_via_symbols
