@@ -13,21 +13,24 @@ int main(int argc, char* argv[]) {
     }
 
     size_t size = 51200000;
-    parse_arguments(argc, argv, &size, nullptr);
+    size_t block_size = 512;
+    parse_arguments(argc, argv, &size, &block_size);
 
-    const char* buf = "6";
+    char* buf = (char*) malloc(block_size);
+    memset(buf, '6', block_size);
 
     start_tstamp = tstamp();
     off_t pos = size;
     size_t n = 0;
     while (pos > 0) {
-        pos -= 1;
+        size_t nw = min((size_t) pos, block_size);
+        pos -= nw;
         if (fseek(f, pos, SEEK_SET) == -1) {
             perror("fseek");
             exit(1);
         }
-        size_t r = fwrite(buf, 1, 1, f);
-        if (r != 1) {
+        size_t r = fwrite(buf, 1, nw, f);
+        if (r != nw) {
             perror("fwrite");
             exit(1);
         }

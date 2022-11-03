@@ -13,15 +13,14 @@ int main(int argc, char* argv[]) {
     }
 
     size_t size = filesize(fd);
-    size_t nread = size;
-    parse_arguments(argc, argv, &nread, nullptr);
+    parse_arguments(argc, argv, &size, nullptr);
 
     char* buf = (char*) malloc(1);
-    start_tstamp = tstamp();
 
+    start_tstamp = tstamp();
     off_t pos = size;
     size_t n = 0;
-    while (n < nread) {
+    while (pos > 0) {
         pos -= 1;
         if (lseek(fd, pos, SEEK_SET) == (off_t) -1) {
             perror("lseek");

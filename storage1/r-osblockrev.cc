@@ -13,19 +13,25 @@ int main(int argc, char* argv[]) {
     }
 
     size_t size = filesize(fd);
-    parse_arguments(argc, argv, &size, nullptr);
+    size_t block_size = 512;
+    parse_arguments(argc, argv, &size, &block_size);
 
-    char* buf = (char*) malloc(1);
+    char* buf = (char*) malloc(block_size);
 
     start_tstamp = tstamp();
+    off_t pos = size;
     size_t n = 0;
-    while (n < size) {
-        ssize_t r = read(fd, buf, 1);
-        if (r == -1) {
+    while (pos > 0) {
+        size_t nr = min((size_t) pos, block_size);
+        pos -= nr;
+        if (lseek(fd, pos, SEEK_SET) == (off_t) -1) {
+            perror("lseek");
+            exit(1);
+        }
+        ssize_t r = read(fd, buf, nr);
+        if ((size_t) r != nr) {
             perror("read");
             exit(1);
-        } else if (r != 1) {
-            break;
         }
         n += r;
         if (n % PRINT_FREQUENCY == 0) {

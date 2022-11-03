@@ -17,7 +17,6 @@ int main(int argc, char* argv[]) {
     parse_arguments(argc, argv, &size, nullptr);
 
     const char* buf = "6";
-    start_tstamp = tstamp();
 
     // extend file size first
     int r = ftruncate(fd, size);
@@ -25,6 +24,8 @@ int main(int argc, char* argv[]) {
         perror("ftruncate");
         exit(1);
     }
+
+    start_tstamp = tstamp(); // include `mmap` in timing
 
     char* file_data = (char*) mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (file_data == (char*) MAP_FAILED) {
