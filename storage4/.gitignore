@@ -11,6 +11,7 @@ waitdemo
 matrixmultiply
 matrixmultiply-base
 matrixmultiply-blas
+matrixmultiply-[ijk][ijk][ijk]
 matrixmultiply-transpose
 accessor
 list-inserter

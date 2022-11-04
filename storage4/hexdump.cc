@@ -3,19 +3,24 @@
 
 static void fhexdump_ascii(FILE* f, const unsigned char* p, size_t pos);
 
-void hexdump(const void* ptr, size_t size) {
-    fhexdump_at(stdout, (size_t) ptr, ptr, size);
+void hexdump(const void* ptr, size_t size, const char* objname) {
+    fhexdump_at(stdout, (size_t) ptr, ptr, size, objname);
 }
 
-void fhexdump(FILE* f, const void* ptr, size_t size) {
-    fhexdump_at(f, (size_t) ptr, ptr, size);
+void fhexdump(FILE* f, const void* ptr, size_t size, const char* objname) {
+    fhexdump_at(f, (size_t) ptr, ptr, size, objname);
 }
 
-void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size) {
+void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size,
+                 const char* objname) {
+    const char* addrfmt = objname ? "  %08zx" : "%08zx";
     const unsigned char* p = (const unsigned char*) ptr;
+    if (objname != nullptr) {
+        fprintf(f, "%s:\n", objname);
+    }
     for (size_t i = 0; i != size; ++i) {
         if (i % 16 == 0) {
-            fprintf(f, "%08zx", first_offset + i);
+            fprintf(f, addrfmt, first_offset + i);
         }
         fprintf(f, "%s%02x", (i % 8 == 0 ? "  " : " "), (unsigned) p[i]);
         if (i % 16 == 15 || i == size - 1) {

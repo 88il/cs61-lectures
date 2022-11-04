@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>
+#include <ctime>
 
 // hexdump(ptr, size)
 //    Print a hexdump of the `size` bytes of data starting at `ptr`
@@ -43,5 +44,14 @@ void fhexdump(FILE* f, const void* ptr, size_t size, const char* objname = nullp
 //    address of `ptr`.
 void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size,
                  const char* objname = nullptr);
+
+
+// cputime()
+//    Return the amount of CPU time this process has taken so far.
+inline double cputime() {
+    struct timespec ts;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+    return ts.tv_sec + (double) ts.tv_nsec * 1e-9;
+}
 
 #endif

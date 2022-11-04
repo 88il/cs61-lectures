@@ -1,12 +1,11 @@
-#include <cstdio>
-#include <cstdlib>
+#include "hexdump.hh"
 #include <cstdint>
 #include <cstring>
 #include <cinttypes>
+#include <ctime>
 #include <cmath>
+#include <utility>
 #include <getopt.h>
-#include <cassert>
-#include <time.h>
 
 // sqmatrix -- type representing square matrices
 struct sqmatrix {
@@ -24,7 +23,9 @@ struct sqmatrix {
         delete[] v;
     }
     sqmatrix(const sqmatrix&) = delete;
+    sqmatrix(sqmatrix&&) = delete;
     sqmatrix& operator=(const sqmatrix&) = delete;
+    sqmatrix& operator=(sqmatrix&&) = delete;
 
 
     // size()
@@ -103,15 +104,6 @@ void matrix_multiply(sqmatrix& c, sqmatrix& a, sqmatrix& b) {
 }
 
 
-// timestamp()
-//    Return the current time.
-double timestamp() {
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return ts.tv_sec + 1e-9 * ts.tv_nsec;
-}
-
-
 // xrandom()
 //    Return a pseudo-random number in the range [0, XRAND_MAX].
 //    We use our own generator to ensure values computed on different
@@ -165,7 +157,7 @@ int main(int argc, char* argv[]) {
     assert(sz < (size_t) sqrt(SIZE_MAX / sizeof(double)));
     if (!has_seed) {
         union { double d; uint64_t x; } u;
-        u.d = timestamp();
+        u.d = cputime();
         xrandom_seed = u.x;
     }
     printf("size %zu, seed %" PRIu64 "\n", sz, xrandom_seed);
@@ -189,12 +181,12 @@ int main(int argc, char* argv[]) {
     }
 
     // compute `c = a * b`
-    double t0 = timestamp();
+    double t0 = cputime();
     matrix_multiply(c, a, b);
-    double t1 = timestamp();
+    double t1 = cputime();
 
     // compute times, print times and ratio
-    printf("multiply time %.09f\n", t1 - t0);
+    printf("CPU TIME %.09f\n", t1 - t0);
 
     // print statistics and differences
     sqmatrix::statistics_type mstat = c.statistics();
