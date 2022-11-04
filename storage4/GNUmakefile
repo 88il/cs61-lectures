@@ -19,6 +19,9 @@ accessor list-inserter fork1 fork2 fork3 forkmix: \
 %: %.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
 
+matrixmultiply: matrixmultiply.o hexdump.o
+	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
+
 matrixmultiply-%: matrixmultiply-%.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
 

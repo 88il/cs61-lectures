@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 int main(int argc, char* argv[]) {
-    constexpr size_t size = 100000000;
+    constexpr size_t size = 100'000'000;
 
     // check for access style argument
     int style = 'u';
