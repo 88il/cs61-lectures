@@ -7,5 +7,5 @@ int main() {
     assert(p1 >= 0);
 
     const char* identity = (p1 == 0 ? "child" : "initial");
-    printf("Hello from %s pid %d\n", identity, getpid());
+    printf("Hello from %s process, pid %d\n", identity, getpid());
 }

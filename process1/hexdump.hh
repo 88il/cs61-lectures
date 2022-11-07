@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>
+#include <ctime>
 
 // hexdump(ptr, size)
 //    Print a hexdump of the `size` bytes of data starting at `ptr`
@@ -54,7 +55,7 @@ inline double cputime() {
 }
 
 // timestamp()
-//    Return the current monotonic timestamp (wall clock time).
+//    Return the current wall clock time (monotonic timestamp).
 inline double timestamp() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

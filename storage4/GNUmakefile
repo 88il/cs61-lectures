@@ -1,7 +1,6 @@
 PROGRAMS = accessor list-inserter \
 	matrixmultiply \
-	$(filter-out matrixmultiply-blas,$(patsubst %.cc,%,$(wildcard matrixmultiply-*.cc))) \
-	fork1 fork2 fork3 forkmix
+	$(filter-out matrixmultiply-blas,$(patsubst %.cc,%,$(wildcard matrixmultiply-*.cc)))
 
 all: $(PROGRAMS)
 
@@ -15,7 +14,7 @@ include ../common/rules.mk
 %.o: %.cc $(BUILDSTAMP)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEPCFLAGS) $(O) -o $@ -c $<
 
-accessor list-inserter fork1 fork2 fork3 forkmix: \
+accessor list-inserter: \
 %: %.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
 
