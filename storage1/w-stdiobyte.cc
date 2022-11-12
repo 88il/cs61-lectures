@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
     parse_arguments(argc, argv, &size, nullptr);
 
     const char* buf = "6";
-    start_tstamp = tstamp();
 
+    start_tstamp = tstamp();
     size_t n = 0;
     while (n < size) {
         int ch = fputc(buf[0], f);

@@ -17,7 +17,8 @@ int main(int argc, char* argv[]) {
     parse_arguments(argc, argv, &size, nullptr);
 
     char* buf = (char*) malloc(1);
-    start_tstamp = tstamp();
+
+    start_tstamp = tstamp(); // include `mmap` in timing
 
     char* file_data = (char*) mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0);
     if (file_data == (char*) MAP_FAILED) {

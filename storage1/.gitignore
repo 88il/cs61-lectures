@@ -8,6 +8,8 @@ r-exitbyte
 [rw]-osbyte
 [rw]-osbyterev
 [rw]-osblock
+[rw]-osblockrev
 [rw]-stdiobyte
 [rw]-stdiobyterev
 [rw]-stdioblock
+[rw]-stdioblockrev

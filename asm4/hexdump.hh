@@ -44,4 +44,21 @@ void fhexdump(FILE* f, const void* ptr, size_t size, const char* objname = nullp
 void fhexdump_at(FILE* f, size_t first_offset, const void* ptr, size_t size,
                  const char* objname = nullptr);
 
+
+// cputime()
+//    Return the amount of CPU time this process has taken so far.
+inline double cputime() {
+    struct timespec ts;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+    return ts.tv_sec + (double) ts.tv_nsec * 1e-9;
+}
+
+// timestamp()
+//    Return the current monotonic timestamp (wall clock time).
+inline double timestamp() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + (double) ts.tv_nsec * 1e-9;
+}
+
 #endif

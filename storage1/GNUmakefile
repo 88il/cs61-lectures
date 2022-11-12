@@ -6,7 +6,7 @@ variants = $(1) $(addsuffix -unsafe,$(1)) $(addsuffix -O0,$(1))
 
 -include config.mk
 ifndef DATAFILE
-DATAFILE = data
+DATAFILE := $(shell if test -e /usr/bin/cs61-docker-version; then echo /var/tmp/data; else echo data; fi)
 endif
 
 O ?= 3

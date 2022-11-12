@@ -17,13 +17,13 @@ int main(int argc, char* argv[]) {
     parse_arguments(argc, argv, &size, &block_size);
 
     char* buf = (char*) malloc(block_size);
-    start_tstamp = tstamp();
 
+    start_tstamp = tstamp();
     size_t n = 0;
     while (n < size) {
         size_t r = fread(buf, 1, block_size, f);
         if (r == 0 && ferror(f)) {
-            perror("read");
+            perror("fread");
             exit(1);
         } else if (r != block_size) {
             break;

@@ -12,16 +12,15 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    size_t size = 5120000;
-    size_t nwrite = size;
-    parse_arguments(argc, argv, &nwrite, nullptr);
+    size_t size = filesize(fd);
+    parse_arguments(argc, argv, &size, nullptr);
 
     const char* buf = "6";
-    start_tstamp = tstamp();
 
-    size_t pos = size;
+    start_tstamp = tstamp();
+    off_t pos = size;
     size_t n = 0;
-    while (n < nwrite) {
+    while (pos > 0) {
         pos -= 1;
         if (lseek(fd, pos, SEEK_SET) == (off_t) -1) {
             perror("lseek");

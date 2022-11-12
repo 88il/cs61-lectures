@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     parse_arguments(argc, argv, &size, nullptr);
 
     start_tstamp = tstamp();
-
     size_t n = 0;
     while (n < size) {
         int ch = fgetc(f);

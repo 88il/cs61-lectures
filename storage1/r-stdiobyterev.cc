@@ -13,14 +13,12 @@ int main(int argc, char* argv[]) {
     }
 
     size_t size = filesize(fileno(f));
-    size_t nread = size;
-    parse_arguments(argc, argv, &nread, nullptr);
+    parse_arguments(argc, argv, &size, nullptr);
 
     start_tstamp = tstamp();
-
     off_t pos = size;
     size_t n = 0;
-    while (n < nread) {
+    while (pos > 0) {
         pos -= 1;
         if (fseek(f, pos, SEEK_SET) == -1) {
             perror("fseek");
