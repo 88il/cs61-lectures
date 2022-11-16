@@ -12,6 +12,7 @@ ALLPROGRAMS = $(PROGRAMS)
 CONFIGMK ?= config.mk
 
 O ?= 3
+PTHREAD ?= 1
 include ../common/rules.mk
 -include $(CONFIGMK)
 
