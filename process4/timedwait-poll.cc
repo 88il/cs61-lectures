@@ -20,5 +20,5 @@ int main(int argc, char** argv) {
     }
 
     // Print results
-    timedwait_print_results(exited_pid, status, errno);
+    timedwait_print_results(exited_pid, status, timestamp() - start_time);
 }

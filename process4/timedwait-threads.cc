@@ -6,7 +6,7 @@ bool quiet = false;
 double exit_delay = 0.5;
 double timeout = 0.75;
 std::mutex m;
-std::condition_variable alert;
+std::condition_variable_any alert;
 pid_t waitresult = -2;
 int waitstatus;
 
@@ -21,17 +21,17 @@ static void child_threadfunc(pid_t p1) {
         waitresult = p;
         waitstatus = status;
     }
-    alert.signal();
+    alert.notify_all();
 }
 
-static void timeout_threadfunc(pid_t p1) {
+static void timeout_threadfunc() {
     usleep((unsigned) (timeout * 1'000'000));
 
     std::unique_lock<std::mutex> guard(m);
     if (waitresult == -2) {
         waitresult = 0;
     }
-    alert.signal();
+    alert.notify_all();
 }
 
 int main(int argc, char** argv) {
@@ -42,9 +42,12 @@ int main(int argc, char** argv) {
     pid_t p1 = timedwait_make_child(exit_delay);
 
     std::thread child_thread(child_threadfunc, p1);
+    child_thread.detach();
     std::thread delay_thread(timeout_threadfunc);
+    delay_thread.detach();
 
     std::unique_lock<std::mutex> guard(m);
     alert.wait(guard);
+
     timedwait_print_results(waitresult, waitstatus, timestamp() - start_time);
 }

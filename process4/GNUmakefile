@@ -1,6 +1,10 @@
 PROGRAMS = makezombies pipesizer filtermultiples primesieve \
-	timedwait-alarm timedwait-block timedwait-blockvar timedwait-poll \
-	timedwait-selfpipe timedwait-selectpipe timedwait-signalfd
+	timedwait-poll \
+	timedwait-block \
+	timedwait-blockvar timedwait-waitblockwait \
+	timedwait-alarm \
+	timedwait-selfpipe timedwait-selectpipe timedwait-signalfd \
+	timedwait-threads
 
 all: $(PROGRAMS)
 

@@ -28,7 +28,7 @@ inline pid_t timedwait_make_child(double delay, bool loud = false) {
 
     if (p == 0) {
         if (delay > 0) {
-            usleep((unsigned) delay * 1'000'000);
+            usleep((unsigned) (delay * 1'000'000));
         }
         if (loud) {
             fprintf(stderr, "%d: child exiting\n", getpid());
