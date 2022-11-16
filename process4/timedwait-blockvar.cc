@@ -22,10 +22,10 @@ int main(int argc, char** argv) {
     pid_t p1 = timedwait_make_child(exit_delay);
 
     // Wait for the timeout or child exit, if child hasn’t exited yet.
-    // `usleep` will either succeed, returning 0 after `timeout` sec,
+    // `dsleep` will either succeed, returning 0 after `timeout` sec,
     // or be interrupted by SIGCHLD, returning -1. (Or will it?)
     if (!got_signal) {
-        r = usleep((unsigned) (timeout * 1'000'000));
+        r = dsleep(timeout);
     }
 
     // Check if child exited

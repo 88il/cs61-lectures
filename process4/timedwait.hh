@@ -28,7 +28,7 @@ inline pid_t timedwait_make_child(double delay, bool loud = false) {
 
     if (p == 0) {
         if (delay > 0) {
-            usleep((unsigned) (delay * 1'000'000));
+            dsleep(delay);
         }
         if (loud) {
             fprintf(stderr, "%d: child exiting\n", getpid());
@@ -47,7 +47,8 @@ inline void timedwait_print_results(pid_t waitresult, int status, double lifetim
         fprintf(stderr, "%d: parent interrupted by %s after %g sec\n",
                 getpid(), strerror(errno), lifetime);
     } else if (waitresult == 0) {
-        fprintf(stderr, "%d: child timed out\n", getpid());
+        fprintf(stderr, "%d: child timed out after %g sec\n",
+                getpid(), lifetime);
     } else if (WIFEXITED(status)) {
         if (!quiet || lifetime > exit_delay + 0.1) {
             fprintf(stderr, "%d: child %d exited with status %d after %g sec\n",

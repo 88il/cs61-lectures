@@ -25,7 +25,7 @@ static void child_threadfunc(pid_t p1) {
 }
 
 static void timeout_threadfunc() {
-    usleep((unsigned) (timeout * 1'000'000));
+    dsleep(timeout);
 
     std::unique_lock<std::mutex> guard(m);
     if (waitresult == -2) {

@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     pid_t exited_pid = waitpid(p1, &status, WNOHANG);
 
     if (exited_pid == 0) {
-        r = usleep((unsigned) (timeout * 1'000'000));
+        r = dsleep(timeout);
         exited_pid = waitpid(p1, &status, WNOHANG);
     }
 

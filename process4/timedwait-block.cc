@@ -20,9 +20,9 @@ int main(int argc, char** argv) {
     pid_t p1 = timedwait_make_child(exit_delay);
 
     // Wait for the timeout or child exit.
-    // `usleep` will either succeed, returning 0 after `timeout` sec,
+    // `dsleep` will either succeed, returning 0 after `timeout` sec,
     // or be interrupted by SIGCHLD, returning -1. (Maybe.)
-    r = usleep((unsigned) (timeout * 1'000'000));
+    r = dsleep(timeout);
     (void) r;
 
     // Print results

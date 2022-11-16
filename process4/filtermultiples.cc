@@ -1,6 +1,7 @@
 #include <cstring>
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
 
 int main(int argc, char** argv) {
     assert(argc >= 2);
