@@ -1,4 +1,5 @@
-#include "helpers.hh"
+#include "hexdump.hh"
+#include <unistd.h>
 
 int main() {
     setvbuf(stdout, nullptr, _IOLBF, 0);

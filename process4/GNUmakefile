@@ -1,8 +1,10 @@
-PROGRAMS = pipelineex
+PROGRAMS = makezombies pipesizer filtermultiples primesieve \
+	timedwait-alarm timedwait-block timedwait-blockvar timedwait-poll \
+	timedwait-selfpipe timedwait-selectpipe timedwait-signalfd
 
 all: $(PROGRAMS)
 
-ALLPROGRAMS = $(PROGRAMS) matrixmultiply-blas
+ALLPROGRAMS = $(PROGRAMS)
 CONFIGMK ?= config.mk
 
 O ?= 3
@@ -12,7 +14,7 @@ include ../common/rules.mk
 %.o: %.cc $(BUILDSTAMP)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEPCFLAGS) $(O) -o $@ -c $<
 
-pipelineex: \
+$(PROGRAMS): \
 %: %.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
 
