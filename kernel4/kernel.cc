@@ -345,13 +345,27 @@ uintptr_t syscall(regstate* regs) {
     case SYSCALL_SPAWN:
         return syscall_spawn((const char*) current->regs.reg_rdi);
 
-    case SYSCALL_WRITE:
-        return syscall_write((const char*) current->regs.reg_rdi,
+    case SYSCALL_WRITE: {
+        ssize_t nr = syscall_write((const char*) current->regs.reg_rdi,
                              current->regs.reg_rsi);
+        if (nr >= 0) {
+            return nr;
+        } else {
+            current->regs.reg_rax = -1;
+            schedule();
+        }
+    }
 
-    case SYSCALL_READ:
-        return syscall_read((char*) current->regs.reg_rdi,
+    case SYSCALL_READ: {
+        ssize_t nr = syscall_read((char*) current->regs.reg_rdi,
                             current->regs.reg_rsi);
+        if (nr >= 0) {
+            return nr;
+        } else {
+            current->regs.reg_rax = -1;
+            schedule();
+        }
+    }
 
     default:
         proc_panic(current, "Unhandled system call %ld (pid=%d, rip=%p)!\n",
@@ -403,6 +417,11 @@ ssize_t syscall_write(const char* buf, size_t sz) {
         // write one character
         pipebuf[0] = buf[0];
         pipebuf_len = 1;
+        for (pid_t p = 1; p != NPROC; ++p) {
+            if (ptable[p].state == P_BLOCKED) {
+                ptable[p].state = P_RUNNABLE;
+            }
+        }
         return 1;
     }
 }
@@ -416,6 +435,7 @@ ssize_t syscall_read(char* buf, size_t sz) {
         return 0;
     } else if (pipebuf_len == 0) {
         // kernel buffer empty, try again
+        current->state = P_BLOCKED;
         return -1;
     } else {
         // read one character

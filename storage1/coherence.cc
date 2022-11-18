@@ -22,6 +22,8 @@ size_t read_using_stdio(char buf[BUFSIZ]) {
         size_t nr = fread(buf, 1, 9, f);
         assert(nr == 9);
 
+        fflush(f);
+
     overwrite("CS 61 is awesome!!\n");
     // Contents of `TESTFILE` is now "CS 61 is awesome!!\n"
 

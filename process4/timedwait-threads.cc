@@ -41,12 +41,14 @@ int main(int argc, char** argv) {
 
     pid_t p1 = timedwait_make_child(exit_delay);
 
+    // We must lock the mutex BEFORE creating threads! (Why?)
+    std::unique_lock<std::mutex> guard(m);
+
     std::thread child_thread(child_threadfunc, p1);
     child_thread.detach();
     std::thread delay_thread(timeout_threadfunc);
     delay_thread.detach();
 
-    std::unique_lock<std::mutex> guard(m);
     alert.wait(guard);
 
     timedwait_print_results(waitresult, waitstatus, timestamp() - start_time);
