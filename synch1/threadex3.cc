@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cassert>
 #include <thread>
 
 void setval(int& v) {

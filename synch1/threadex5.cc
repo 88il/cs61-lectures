@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstring>
 #include <thread>
 #include <ctime>
 #include <unistd.h>
