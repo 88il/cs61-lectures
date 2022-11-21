@@ -1,6 +1,7 @@
 PROGRAMS = threadex1 threadex2 threadex3 threadex4 threadex5 \
 	incr-atomic incr-basic incr-mutex incr-scopedlock \
-	incr-spinlock incr-spinlock2 incr-trymutex incr-volatile
+	incr-spinlock incr-spinlock2 incr-trymutex incr-volatile \
+	incr-atomicbad
 
 all: $(PROGRAMS)
 
