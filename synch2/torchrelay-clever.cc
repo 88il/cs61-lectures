@@ -73,5 +73,5 @@ int main() {
     int r = getrusage(RUSAGE_SELF, &ru);
     assert(r >= 0);
     fprintf(stderr, "%lu handoffs with %ld.%06dsec CPU time\n",
-            nhandoffs.load(), ru.ru_utime.tv_sec, ru.ru_utime.tv_usec);
+            nhandoffs.load(), ru.ru_utime.tv_sec, (int) ru.ru_utime.tv_usec);
 }
