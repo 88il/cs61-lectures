@@ -4,9 +4,6 @@
 #include "bench.hh"
 
 
-typedef float vsf __attribute__((vector_size (16)));
-
-
 [[gnu::noinline]]
 void multiply_all(float* ptr, size_t n, float multiplier) {
     float* end = ptr + n;
@@ -15,6 +12,9 @@ void multiply_all(float* ptr, size_t n, float multiplier) {
         ++ptr;
     }
 }
+
+
+typedef float vsf __attribute__((vector_size (16)));
 
 
 [[gnu::noinline]]

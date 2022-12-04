@@ -23,8 +23,8 @@ int main() {
         dup2(pfd[1], 1);
         close(pfd[0]);
         close(pfd[1]);
-        char* const args[] = {"echo","rororrroororoorororooror",nullptr};
-        int r = execvp(args[0], (char* const*) args);
+        const char* const args[] = {"echo", "rororrroororoorororooror", nullptr};
+        r = execvp(args[0], (char* const*) args);
         assert(false);
     }
 
@@ -41,8 +41,8 @@ int main() {
         close(pfd[0]);
         close(pfd2[0]);
         close(pfd2[1]);
-        const char* args[] = { "tr", "-d", "o",nullptr};
-        r =  execvp(args[0], (char* const*) args);
+        const char* const args[] = {"tr", "-d", "o", nullptr};
+        r = execvp(args[0], (char* const*) args);
         assert(false);
     }
 
@@ -53,7 +53,7 @@ int main() {
     if (pc == 0) {
         dup2(pfd2[0], 0);
         close(pfd2[0]);
-        const char* args[] = {"wc", "-c", nullptr};
+        const char* const args[] = {"wc", "-c", nullptr};
         r = execvp(args[0], (char* const*) args);
         assert(false);
     }

@@ -55,7 +55,7 @@ inline double cputime() {
 }
 
 // timestamp()
-//    Return the current monotonic timestamp (wall clock time).
+//    Return the current wall clock time (monotonic timestamp).
 inline double timestamp() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

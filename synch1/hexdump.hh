@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 // hexdump(ptr, size)
 //    Print a hexdump of the `size` bytes of data starting at `ptr`
@@ -60,6 +61,17 @@ inline double timestamp() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec + (double) ts.tv_nsec * 1e-9;
+}
+
+// dsleep(d)
+//    Sleep for at least `d` seconds.
+inline int dsleep(double d) {
+    double intpart;
+    double fracpart = modf(d, &intpart);
+    struct timespec ts = {
+        (long) intpart, (long) (fracpart * 1'000'000'000)
+    };
+    return nanosleep(&ts, nullptr);
 }
 
 #endif

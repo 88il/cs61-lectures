@@ -1,5 +1,5 @@
-PROGRAMS = manyfloat
-BASEPROGRAMS = manyfloat
+PROGRAMS = manyfloat copytest
+BASEPROGRAMS = manyfloat copytest
 BUILDABLEASM := $(patsubst asmsrc/%.cc,%.s,$(wildcard asmsrc/*.cc))
 all: $(PROGRAMS) $(BUILDABLEASM)
 
@@ -10,7 +10,7 @@ variants = $(1) $(addsuffix -san,$(1)) $(addsuffix -noopt,$(1)) \
 	$(addsuffix -gcc,$(1)) $(addsuffix -gcc-noopt,$(1))
 
 NEED_CXX_GCC = 1
-CXXFLAGS += -march=native -mtune=native
+CXXFLAGS += -march=x86-64-v2
 O ?= 1
 include ../common/rules.mk
 

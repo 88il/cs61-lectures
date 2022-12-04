@@ -1,4 +1,5 @@
-#include "helpers.hh"
+#include "hexdump.hh"
+#include <unistd.h>
 
 int main() {
     setvbuf(stdout, nullptr, _IOLBF, 0);
@@ -9,7 +10,7 @@ int main() {
             exit(0);
         }
         printf("makezombies[%d]: make child %d\n", getpid(), p);
-        usleep(10000);
+        usleep(10'000);
     }
-    usleep(1000000);
+    sleep(1000);
 }
